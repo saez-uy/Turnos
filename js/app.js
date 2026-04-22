@@ -22,11 +22,13 @@ function populateServicios() {
 }
 
 function setDateLimits() {
-  const today  = new Date();
+  const today    = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
   const maxDay = new Date();
   maxDay.setDate(today.getDate() + CONFIG.diasAnticipacion);
   const input = document.getElementById('fecha');
-  input.min = toYMD(today);
+  input.min = toYMD(tomorrow);
   input.max = toYMD(maxDay);
 }
 
@@ -212,6 +214,7 @@ async function confirmar() {
   const nombre   = document.getElementById('nombre').value.trim();
   const telefono = document.getElementById('telefono').value.trim();
   if (!nombre || !telefono) { alert('Nombre y teléfono son obligatorios.'); return; }
+  if (nombre.length < 8) { alert('El nombre debe tener al menos 8 caracteres.'); return; }
 
   renderResumen('resumen-paso3');
 
