@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar Turno</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <h1 id="header-title"></h1>
+  <p  id="header-slogan"></p>
+</header>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- PASO 1: Servicio y fecha -->
+  <div class="step">
+    <div class="card">
+      <div class="card-title"><span class="step-num">1</span> Servicio y fecha</div>
+
+      <div class="field">
+        <label for="servicio">Servicio</label>
+        <select id="servicio">
+          <option value="">-- Elegí un servicio --</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha">
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="irPaso2()">Ver turnos disponibles →</button>
+    </div>
+  </div>
+
+  <!-- PASO 2: Selección de horario -->
+  <div class="step" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="step-num">2</span> Elegí un horario</div>
+      <div id="slots-container">
+        <p class="slots-empty">Seleccioná una fecha para ver los turnos disponibles.</p>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-outline" onclick="goToStep(1)">← Volver</button>
+        <button class="btn btn-primary" id="btn-paso2" onclick="irPaso3()" disabled>Continuar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 3: Datos del cliente + confirmación -->
+  <div class="step" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="step-num">3</span> Tus datos</div>
+
+      <div id="resumen-paso3" class="resumen"></div>
+      <button class="btn btn-outline btn-full" style="margin-bottom:20px; font-size:0.85rem" onclick="goToStep(2)">
+        ← Cambiar horario
+      </button>
+
+      <div class="field">
+        <label for="nombre">Nombre completo *</label>
+        <input type="text" id="nombre" placeholder="Ej: María González">
+      </div>
+      <div class="field">
+        <label for="telefono">Teléfono *</label>
+        <input type="tel" id="telefono" placeholder="Ej: 11-2345-6789">
+      </div>
+      <div class="field">
+        <label for="email">Email (opcional)</label>
+        <input type="email" id="email" placeholder="Ej: maria@email.com">
+      </div>
+      <div class="field">
+        <label for="notas">Notas (opcional)</label>
+        <textarea id="notas" placeholder="¿Alguna indicación especial?"></textarea>
+      </div>
+
+      <div id="alerta-confirmar"></div>
+
+      <button class="btn btn-primary btn-full" id="btn-confirmar" onclick="confirmar()">
+        Confirmar turno
+      </button>
+    </div>
+  </div>
+
+  <!-- PASO 4: Éxito -->
+  <div class="step" style="display:none">
+    <div class="card">
+      <div class="exito">
+        <div class="icono">✅</div>
+        <h2>¡Reserva confirmada!</h2>
+        <p id="msg-exito"></p>
+      </div>
+      <div id="resumen-exito" class="resumen"></div>
+      <button class="btn btn-primary btn-full" onclick="nuevaReserva()">Hacer otra reserva</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
