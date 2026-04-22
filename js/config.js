@@ -40,4 +40,7 @@ const CONFIG = {
 
   // Cuántos días hacia adelante se pueden hacer reservas
   diasAnticipacion: 30,
+
+  // Contraseña del panel de administración
+  adminPassword: "admin1234",
 };

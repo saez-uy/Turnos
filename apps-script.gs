@@ -24,6 +24,16 @@ function doGet(e) {
       return guardarReserva(e.parameter);
     }
 
+    if (action === "reservas") {
+      return respuesta({ reservas: getTodasLasReservas() });
+    }
+
+    if (action === "cancelar") {
+      const id = e.parameter.id;
+      if (!id) return respuesta({ error: "Falta el parámetro id" });
+      return cancelarReserva(id);
+    }
+
     // debug: ver qué hay en el sheet
     if (action === "list") {
       const sheet = getSheet();
@@ -76,6 +86,43 @@ function guardarReserva(p) {
   ]);
 
   return respuesta({ ok: true, id });
+}
+
+// ---- Listar todas las reservas (para el panel admin) ----
+function getTodasLasReservas() {
+  const sheet = getSheet();
+  const data  = sheet.getDataRange().getValues();
+  const reservas = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    reservas.push({
+      id:       limpiarCelda(row[0]),
+      nombre:   limpiarCelda(row[1]),
+      telefono: limpiarCelda(row[2]),
+      email:    limpiarCelda(row[3]),
+      servicio: limpiarCelda(row[4]),
+      duracion: limpiarCelda(row[5]),
+      fecha:    limpiarCelda(row[6]),
+      hora:     limpiarCelda(row[7]),
+      estado:   limpiarCelda(row[8]),
+      notas:    limpiarCelda(row[9]),
+      creado:   limpiarCelda(row[10]),
+    });
+  }
+  return reservas;
+}
+
+// ---- Cancelar una reserva ----
+function cancelarReserva(id) {
+  const sheet = getSheet();
+  const data  = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (limpiarCelda(data[i][0]) === id) {
+      sheet.getRange(i + 1, 9).setValue("Cancelado");
+      return respuesta({ ok: true });
+    }
+  }
+  return respuesta({ error: "Reserva no encontrada" });
 }
 
 // ---- Leer turnos ocupados ----

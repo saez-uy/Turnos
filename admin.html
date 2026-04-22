@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Reservas</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🗓️</div>
+    <h2>Panel de Administración</h2>
+    <p class="login-sub">Ingresá la contraseña para continuar</p>
+    <div class="field">
+      <label for="pwd">Contraseña</label>
+      <input type="password" id="pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    </div>
+    <div id="login-error" class="alert alert-danger" style="display:none">Contraseña incorrecta.</div>
+    <button class="btn btn-primary btn-full" onclick="login()">Ingresar</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+
+  <div class="admin-header">
+    <div class="admin-header-left">
+      <span class="admin-logo">🗓️</span>
+      <div>
+        <div class="admin-title" id="admin-negocio"></div>
+        <div class="admin-subtitle">Panel de Reservas</div>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-hoy">—</div>
+        <div class="stat-label">Hoy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-semana">—</div>
+        <div class="stat-label">Esta semana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-pendientes">—</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-card">
+      <div class="filtros-row">
+        <div class="field">
+          <label for="f-desde">Desde</label>
+          <input type="date" id="f-desde">
+        </div>
+        <div class="field">
+          <label for="f-hasta">Hasta</label>
+          <input type="date" id="f-hasta">
+        </div>
+        <div class="field">
+          <label for="f-estado">Estado</label>
+          <select id="f-estado">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-buscar">Buscar</label>
+          <input type="text" id="f-buscar" placeholder="Nombre, teléfono...">
+        </div>
+        <div class="field field-btn">
+          <button class="btn btn-primary" onclick="aplicarFiltros()">Filtrar</button>
+          <button class="btn btn-outline" onclick="limpiarFiltros()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="tabla-card">
+      <div class="tabla-header">
+        <span id="tabla-count" class="tabla-count"></span>
+        <button class="btn btn-outline btn-sm" onclick="cargarReservas()">↻ Actualizar</button>
+      </div>
+      <div id="tabla-wrapper">
+        <p class="slots-empty" style="padding:20px 0">Cargando reservas...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+/* ── Login ── */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 20px;
+}
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+.login-logo { font-size: 3rem; margin-bottom: 14px; }
+.login-card h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.login-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+.login-card .field { text-align: left; }
+
+/* ── Admin header ── */
+.admin-header {
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+.admin-header-left { display: flex; align-items: center; gap: 12px; }
+.admin-logo { font-size: 1.8rem; }
+.admin-title { font-size: 1.05rem; font-weight: 700; }
+.admin-subtitle { font-size: 0.8rem; opacity: 0.8; }
+.admin-header .btn-outline {
+  border-color: rgba(255,255,255,0.6);
+  color: #fff;
+  font-size: 0.82rem;
+  padding: 7px 14px;
+}
+.admin-header .btn-outline:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Body ── */
+.admin-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ── Stats ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 6px;
+}
+
+/* ── Filtros ── */
+.filtros-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.filtros-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+.filtros-row .field {
+  flex: 1;
+  min-width: 140px;
+  margin-bottom: 0;
+}
+.filtros-row .field-btn {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* ── Tabla ── */
+.tabla-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tabla-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tabla-count {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+#tabla-wrapper { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+thead th {
+  background: #f8fafc;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f8fafc; }
+tbody td { padding: 11px 14px; color: var(--text); }
+tbody td.muted { color: var(--muted); font-size: 0.82rem; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.badge-pendiente { background: #fef9c3; color: #854d0e; }
+.badge-cancelado { background: #fee2e2; color: #991b1b; }
+
+.btn-sm { font-size: 0.8rem; padding: 6px 14px; }
+.btn-danger { background: var(--danger); color: #fff; border: none; }
+.btn-danger:hover { background: #dc2626; }
+.btn-danger:disabled { background: #fca5a5; cursor: not-allowed; }
+
+@media (max-width: 700px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .filtros-row .field { min-width: 120px; }
+  .admin-header { padding: 12px 16px; }
+}
+@media (max-width: 420px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .login-card { padding: 28px 20px; }
+}

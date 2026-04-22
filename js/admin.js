@@ -1,0 +1,208 @@
+let todasLasReservas = [];
+
+// ── Login ──
+
+function login() {
+  const val = document.getElementById('pwd').value;
+  if (val === CONFIG.adminPassword) {
+    sessionStorage.setItem('admin_ok', '1');
+    mostrarDashboard();
+  } else {
+    document.getElementById('login-error').style.display = '';
+    document.getElementById('pwd').value = '';
+    document.getElementById('pwd').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('admin_ok');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = '';
+  document.getElementById('pwd').value = '';
+}
+
+function mostrarDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = '';
+  document.getElementById('admin-negocio').textContent = CONFIG.negocio;
+  cargarReservas();
+}
+
+// ── Carga de datos ──
+
+async function cargarReservas() {
+  document.getElementById('tabla-wrapper').innerHTML =
+    '<p class="slots-empty" style="padding:20px">Cargando reservas...</p>';
+
+  try {
+    const url  = `${CONFIG.appsScriptUrl}?action=reservas`;
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    todasLasReservas = data.reservas || [];
+    actualizarStats();
+    aplicarFiltros();
+  } catch (e) {
+    document.getElementById('tabla-wrapper').innerHTML =
+      `<div class="alert alert-danger" style="margin:20px">Error al cargar reservas: ${e.message}</div>`;
+  }
+}
+
+// ── Stats ──
+
+function actualizarStats() {
+  const hoy       = toYMD(new Date());
+  const inicioSem = inicioSemana();
+
+  const activas   = todasLasReservas.filter(r => r.estado !== 'Cancelado');
+  const deHoy     = activas.filter(r => r.fecha === hoy);
+  const deSemana  = activas.filter(r => r.fecha >= inicioSem && r.fecha <= hoy);
+  const pendientes= activas.filter(r => r.estado === 'Pendiente');
+
+  document.getElementById('stat-hoy').textContent       = deHoy.length;
+  document.getElementById('stat-semana').textContent    = deSemana.length;
+  document.getElementById('stat-pendientes').textContent= pendientes.length;
+  document.getElementById('stat-total').textContent     = todasLasReservas.length;
+}
+
+// ── Filtros ──
+
+function aplicarFiltros() {
+  const desde  = document.getElementById('f-desde').value;
+  const hasta  = document.getElementById('f-hasta').value;
+  const estado = document.getElementById('f-estado').value;
+  const buscar = document.getElementById('f-buscar').value.toLowerCase().trim();
+
+  const filtradas = todasLasReservas.filter(r => {
+    if (desde  && r.fecha < desde)  return false;
+    if (hasta  && r.fecha > hasta)  return false;
+    if (estado && r.estado !== estado) return false;
+    if (buscar) {
+      const hay = [r.nombre, r.telefono, r.email, r.servicio, r.notas]
+        .join(' ').toLowerCase();
+      if (!hay.includes(buscar)) return false;
+    }
+    return true;
+  });
+
+  renderTabla(filtradas);
+}
+
+function limpiarFiltros() {
+  document.getElementById('f-desde').value  = '';
+  document.getElementById('f-hasta').value  = '';
+  document.getElementById('f-estado').value = '';
+  document.getElementById('f-buscar').value = '';
+  aplicarFiltros();
+}
+
+// ── Tabla ──
+
+function renderTabla(lista) {
+  document.getElementById('tabla-count').textContent =
+    `${lista.length} reserva${lista.length !== 1 ? 's' : ''}`;
+
+  if (!lista.length) {
+    document.getElementById('tabla-wrapper').innerHTML =
+      '<p class="slots-empty" style="padding:20px">No hay reservas para mostrar.</p>';
+    return;
+  }
+
+  const ordenadas = [...lista].sort((a, b) => {
+    if (a.fecha !== b.fecha) return b.fecha.localeCompare(a.fecha);
+    return b.hora.localeCompare(a.hora);
+  });
+
+  const rows = ordenadas.map(r => `
+    <tr>
+      <td>${formatFecha(r.fecha)}</td>
+      <td><strong>${r.hora}</strong></td>
+      <td>${esc(r.nombre)}</td>
+      <td class="muted">${esc(r.telefono)}</td>
+      <td class="muted">${esc(r.email)}</td>
+      <td>${esc(r.servicio)}</td>
+      <td><span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span></td>
+      <td class="muted">${esc(r.notas)}</td>
+      <td>
+        ${r.estado !== 'Cancelado'
+          ? `<button class="btn btn-danger btn-sm" onclick="cancelar('${r.id}', this)">Cancelar</button>`
+          : '—'}
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('tabla-wrapper').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Servicio</th>
+          <th>Estado</th>
+          <th>Notas</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+// ── Cancelar ──
+
+async function cancelar(id, btn) {
+  if (!confirm('¿Cancelar este turno?')) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const url  = `${CONFIG.appsScriptUrl}?action=cancelar&id=${encodeURIComponent(id)}`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Error desconocido');
+
+    const r = todasLasReservas.find(x => x.id === id);
+    if (r) r.estado = 'Cancelado';
+    actualizarStats();
+    aplicarFiltros();
+  } catch (e) {
+    alert('No se pudo cancelar: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Cancelar';
+  }
+}
+
+// ── Helpers ──
+
+function toYMD(d) {
+  return d.toISOString().split('T')[0];
+}
+
+function inicioSemana() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return toYMD(d);
+}
+
+function formatFecha(ymd) {
+  return new Date(ymd + 'T00:00:00').toLocaleDateString('es-AR', {
+    weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric'
+  });
+}
+
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ──
+
+if (sessionStorage.getItem('admin_ok') === '1') {
+  mostrarDashboard();
+}
