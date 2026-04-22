@@ -31,7 +31,13 @@ function doGet(e) {
     if (action === "cancelar") {
       const id = e.parameter.id;
       if (!id) return respuesta({ error: "Falta el parámetro id" });
-      return cancelarReserva(id);
+      return cambiarEstado(id, "Cancelado");
+    }
+
+    if (action === "confirmar") {
+      const id = e.parameter.id;
+      if (!id) return respuesta({ error: "Falta el parámetro id" });
+      return cambiarEstado(id, "Confirmada");
     }
 
     // debug: ver qué hay en el sheet
@@ -112,13 +118,13 @@ function getTodasLasReservas() {
   return reservas;
 }
 
-// ---- Cancelar una reserva ----
-function cancelarReserva(id) {
+// ---- Cambiar estado de una reserva ----
+function cambiarEstado(id, nuevoEstado) {
   const sheet = getSheet();
   const data  = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (limpiarCelda(data[i][0]) === id) {
-      sheet.getRange(i + 1, 9).setValue("Cancelado");
+      sheet.getRange(i + 1, 9).setValue(nuevoEstado);
       return respuesta({ ok: true });
     }
   }

@@ -125,10 +125,13 @@ function renderTabla(lista) {
       <td>${esc(r.servicio)}</td>
       <td><span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span></td>
       <td class="muted">${esc(r.notas)}</td>
-      <td>
-        ${r.estado !== 'Cancelado'
-          ? `<button class="btn btn-danger btn-sm" onclick="cancelar('${r.id}', this)">Cancelar</button>`
-          : '—'}
+      <td class="acciones">
+        ${r.estado === 'Cancelado' ? '—' : `
+          <button class="btn btn-danger btn-sm" onclick="cancelar('${r.id}', this)">Cancelar</button>
+          ${r.estado !== 'Confirmada'
+            ? `<button class="btn btn-success btn-sm" onclick="confirmarTurno('${r.id}', this)">Confirmar</button>`
+            : ''}
+        `}
       </td>
     </tr>
   `).join('');
@@ -153,27 +156,36 @@ function renderTabla(lista) {
   `;
 }
 
-// ── Cancelar ──
+// ── Cancelar / Confirmar ──
 
 async function cancelar(id, btn) {
   if (!confirm('¿Cancelar este turno?')) return;
+  await cambiarEstado(id, 'cancelar', 'Cancelado', btn, 'Cancelar');
+}
+
+async function confirmarTurno(id, btn) {
+  if (!confirm('¿Confirmar este turno?')) return;
+  await cambiarEstado(id, 'confirmar', 'Confirmada', btn, 'Confirmar');
+}
+
+async function cambiarEstado(id, action, nuevoEstado, btn, labelOriginal) {
   btn.disabled = true;
   btn.textContent = '...';
 
   try {
-    const url  = `${CONFIG.appsScriptUrl}?action=cancelar&id=${encodeURIComponent(id)}`;
+    const url  = `${CONFIG.appsScriptUrl}?action=${action}&id=${encodeURIComponent(id)}`;
     const res  = await fetch(url);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Error desconocido');
 
     const r = todasLasReservas.find(x => x.id === id);
-    if (r) r.estado = 'Cancelado';
+    if (r) r.estado = nuevoEstado;
     actualizarStats();
     aplicarFiltros();
   } catch (e) {
-    alert('No se pudo cancelar: ' + e.message);
+    alert(`No se pudo actualizar: ${e.message}`);
     btn.disabled = false;
-    btn.textContent = 'Cancelar';
+    btn.textContent = labelOriginal;
   }
 }
 
