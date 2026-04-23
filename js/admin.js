@@ -1,10 +1,28 @@
 let todasLasReservas = [];
+let adminPassword = CONFIG.adminPassword || 'admin1234';
+
+// ── Init ──
+
+async function initAdmin() {
+  try {
+    if (CONFIG.appsScriptUrl && CONFIG.appsScriptUrl !== 'PEGAR_URL_AQUI') {
+      const res  = await fetch(`${CONFIG.appsScriptUrl}?action=config`);
+      const data = await res.json();
+      if (data.general && data.general.adminPassword) adminPassword = data.general.adminPassword;
+      if (data.colores) aplicarColores(data.colores);
+    }
+  } catch (e) { /* usa contraseña de config.js como fallback */ }
+
+  if (sessionStorage.getItem('admin_ok') === '1') {
+    mostrarDashboard();
+  }
+}
 
 // ── Login ──
 
 function login() {
   const val = document.getElementById('pwd').value;
-  if (val === CONFIG.adminPassword) {
+  if (val === adminPassword) {
     sessionStorage.setItem('admin_ok', '1');
     mostrarDashboard();
   } else {
@@ -238,8 +256,4 @@ function esc(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ── Init ──
-
-if (sessionStorage.getItem('admin_ok') === '1') {
-  mostrarDashboard();
-}
+initAdmin();

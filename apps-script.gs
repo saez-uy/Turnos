@@ -27,6 +27,7 @@ const CONFIG_DEFAULTS = [
   ["general",  "mensaje",                 "¡Tu turno fue reservado con éxito! Te esperamos.", "Mensaje al confirmar una reserva"],
   ["general",  "diasAnticipacion",        "30",                          "Días máximos de anticipación para reservar"],
   ["general",  "intervalo",               "30",                          "Minutos entre turnos disponibles"],
+  ["general",  "adminPassword",           "admin1234",                   "Contraseña del panel de administración"],
   ["horario",  "lunes",                   "09:00-18:00",                 "Vacío = no atiende ese día"],
   ["horario",  "martes",                  "09:00-18:00",                 "Vacío = no atiende ese día"],
   ["horario",  "miercoles",               "09:00-18:00",                 "Vacío = no atiende ese día"],
