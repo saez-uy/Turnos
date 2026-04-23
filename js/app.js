@@ -2,12 +2,40 @@ let selectedSlot = null;
 
 // ---- Inicialización ----
 
-function init() {
-  document.getElementById('header-title').textContent   = CONFIG.negocio;
-  document.getElementById('header-slogan').textContent  = CONFIG.slogan;
+async function init() {
+  document.getElementById('header-title').textContent  = CONFIG.negocio;
+  document.getElementById('header-slogan').textContent = CONFIG.slogan;
   document.title = CONFIG.negocio;
+
+  try {
+    if (CONFIG.appsScriptUrl && CONFIG.appsScriptUrl !== 'PEGAR_URL_AQUI') {
+      const res  = await fetch(`${CONFIG.appsScriptUrl}?action=config`);
+      const data = await res.json();
+      if (data.servicios && data.servicios.length) CONFIG.servicios = data.servicios;
+      if (data.colores) aplicarColores(data.colores);
+    }
+  } catch (e) {
+    console.warn('No se pudo cargar configuración dinámica:', e);
+  }
+
   populateServicios();
   setDateLimits();
+}
+
+function aplicarColores(colores) {
+  const map = {
+    'primary':      '--primary',
+    'primary-dark': '--primary-dark',
+    'success':      '--success',
+    'danger':       '--danger',
+    'bg':           '--bg',
+  };
+  const root = document.documentElement;
+  Object.entries(colores).forEach(([key, val]) => {
+    if (map[key] && /^#[0-9a-fA-F]{3,6}$/.test(val)) {
+      root.style.setProperty(map[key], val);
+    }
+  });
 }
 
 function populateServicios() {

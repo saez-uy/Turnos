@@ -2,12 +2,25 @@
 //  GOOGLE APPS SCRIPT — pegá este código en script.google.com
 // ============================================================
 
-const HOJA_NOMBRE = "Reservas";
+const HOJA_NOMBRE   = "Reservas";
+const CONFIG_NOMBRE = "Configuracion";
 
 const HEADERS = [
   "ID", "Nombre", "Telefono", "Email",
   "Servicio", "Duracion", "Fecha", "Hora",
   "Estado", "Notas", "Creado"
+];
+
+const CONFIG_DEFAULTS = [
+  ["servicio", "Consulta general",        "30",      "Duración en minutos"],
+  ["servicio", "Consulta especializada",  "60",      "Duración en minutos"],
+  ["servicio", "Seguimiento",             "20",      "Duración en minutos"],
+  ["servicio", "Tratamiento completo",    "90",      "Duración en minutos"],
+  ["color",    "primary",                 "#4f6ef7", "Color principal (botones, encabezado)"],
+  ["color",    "primary-dark",            "#3a57e8", "Color principal al pasar el mouse"],
+  ["color",    "success",                 "#22c55e", "Color de éxito (confirmación)"],
+  ["color",    "danger",                  "#ef4444", "Color de error y cancelar"],
+  ["color",    "bg",                      "#f1f5f9", "Color de fondo de la página"],
 ];
 
 function doGet(e) {
@@ -22,6 +35,10 @@ function doGet(e) {
 
     if (action === "save") {
       return guardarReserva(e.parameter);
+    }
+
+    if (action === "config") {
+      return respuesta(getConfig());
     }
 
     if (action === "reservas") {
@@ -129,6 +146,45 @@ function cambiarEstado(id, nuevoEstado) {
     }
   }
   return respuesta({ error: "Reserva no encontrada" });
+}
+
+// ---- Configuración dinámica ----
+function getConfig() {
+  const sheet = getOrCreateConfigSheet();
+  const data  = sheet.getDataRange().getValues();
+  const servicios = [];
+  const colores   = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const tipo   = String(data[i][0]).trim();
+    const nombre = String(data[i][1]).trim();
+    const valor  = String(data[i][2]).trim();
+    if (!tipo || !nombre || !valor) continue;
+    if (tipo === "servicio") {
+      servicios.push({ nombre, duracion: parseInt(valor) || 30 });
+    } else if (tipo === "color") {
+      colores[nombre] = valor;
+    }
+  }
+  return { servicios, colores };
+}
+
+function getOrCreateConfigSheet() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet   = ss.getSheetByName(CONFIG_NOMBRE);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG_NOMBRE);
+    const headers = ["Tipo", "Nombre", "Valor", "Descripción"];
+    sheet.appendRow(headers);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setBackground("#4f6ef7")
+      .setFontColor("#ffffff")
+      .setFontWeight("bold");
+    CONFIG_DEFAULTS.forEach(row => sheet.appendRow(row));
+    sheet.autoResizeColumns(1, 4);
+  }
+  return sheet;
 }
 
 // ---- Leer turnos ocupados ----

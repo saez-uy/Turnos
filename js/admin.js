@@ -21,11 +21,36 @@ function logout() {
   document.getElementById('pwd').value = '';
 }
 
-function mostrarDashboard() {
+async function mostrarDashboard() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = '';
   document.getElementById('admin-negocio').textContent = CONFIG.negocio;
+
+  try {
+    if (CONFIG.appsScriptUrl && CONFIG.appsScriptUrl !== 'PEGAR_URL_AQUI') {
+      const res  = await fetch(`${CONFIG.appsScriptUrl}?action=config`);
+      const data = await res.json();
+      if (data.colores) aplicarColores(data.colores);
+    }
+  } catch (e) { /* usa colores por defecto */ }
+
   cargarReservas();
+}
+
+function aplicarColores(colores) {
+  const map = {
+    'primary':      '--primary',
+    'primary-dark': '--primary-dark',
+    'success':      '--success',
+    'danger':       '--danger',
+    'bg':           '--bg',
+  };
+  const root = document.documentElement;
+  Object.entries(colores).forEach(([key, val]) => {
+    if (map[key] && /^#[0-9a-fA-F]{3,6}$/.test(val)) {
+      root.style.setProperty(map[key], val);
+    }
+  });
 }
 
 // ── Carga de datos ──
