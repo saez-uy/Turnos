@@ -66,7 +66,6 @@ function aplicarColores(colores) {
     'primary-dark': '--primary-dark',
     'success':      '--success',
     'danger':       '--danger',
-    'bg':           '--bg',
   };
   const root = document.documentElement;
   Object.entries(colores).forEach(([key, val]) => {
