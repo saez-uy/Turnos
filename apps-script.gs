@@ -23,6 +23,7 @@ const CONFIG_DEFAULTS = [
   ["color",    "bg",                      "#f1f5f9",                     "Color de fondo de la página"],
   ["general",  "negocio",                 "Mi Negocio",                  "Nombre del negocio (aparece en el encabezado)"],
   ["general",  "slogan",                  "Reservá tu turno online",     "Texto debajo del nombre"],
+  ["general",  "direccion",              "",                            "Dirección del local (aparece debajo del slogan)"],
   ["general",  "telefono",                "11-1234-5678",                "Teléfono de contacto"],
   ["general",  "mensaje",                 "¡Tu turno fue reservado con éxito! Te esperamos.", "Mensaje al confirmar una reserva"],
   ["general",  "diasAnticipacion",        "30",                          "Días máximos de anticipación para reservar"],

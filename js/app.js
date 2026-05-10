@@ -26,6 +26,7 @@ async function init() {
         const g = data.general;
         if (g.negocio)           CONFIG.negocio              = g.negocio;
         if (g.slogan)            CONFIG.slogan               = g.slogan;
+        if (g.direccion)         CONFIG.direccion            = g.direccion;
         if (g.telefono)          CONFIG.telefono             = g.telefono;
         if (g.mensaje)           CONFIG.mensajeConfirmacion  = g.mensaje;
         if (g.diasAnticipacion)  CONFIG.diasAnticipacion     = parseInt(g.diasAnticipacion);
@@ -39,6 +40,11 @@ async function init() {
   document.getElementById('header-title').textContent  = CONFIG.negocio;
   document.getElementById('header-slogan').textContent = CONFIG.slogan;
   document.title = CONFIG.negocio;
+  const elDireccion = document.getElementById('header-direccion');
+  if (CONFIG.direccion) {
+    elDireccion.textContent = '📍 ' + CONFIG.direccion;
+    elDireccion.style.display = '';
+  }
   populateServicios();
   setDateLimits();
 
