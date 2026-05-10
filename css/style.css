@@ -30,7 +30,9 @@ body {
 }
 .header h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.3px; }
 .header p  { margin-top: 6px; opacity: 0.85; font-size: 0.98rem; }
-.header-direccion { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+.header-sub { display: block; font-size: 0.85rem; opacity: 0.75; margin-top: 5px; }
+.header-tel { color: #fff; text-decoration: none; }
+.header-tel:hover { opacity: 1; text-decoration: underline; }
 
 /* Progress */
 .progress {

@@ -16,8 +16,9 @@
   max-width: 380px;
   text-align: center;
 }
-.login-logo { font-size: 3rem; margin-bottom: 14px; }
-.login-card h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.login-logo { font-size: 3rem; margin-bottom: 10px; }
+.login-negocio { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 2px; min-height: 1.4em; }
+.login-card h2 { font-size: 1.1rem; margin-bottom: 6px; color: var(--text); }
 .login-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
 .login-card .field { text-align: left; }
 
@@ -163,6 +164,28 @@ tbody td.muted { color: var(--muted); font-size: 0.82rem; }
 .btn-success:hover { background: #16a34a; }
 .btn-success:disabled { background: #86efac; cursor: not-allowed; }
 .acciones { display: flex; gap: 6px; align-items: center; }
+
+/* ── Tabs rápidos ── */
+.tabs-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: var(--shadow);
+}
+.tab-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+.tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
 /* ── Vista toggle ── */
 .vista-toggle {

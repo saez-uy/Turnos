@@ -1,6 +1,7 @@
 let todasLasReservas = [];
 let adminPassword = CONFIG.adminPassword || 'admin1234';
 let vistaActual = 'lista';
+let tabActual = 'todas';
 
 // ── Init ──
 
@@ -22,7 +23,9 @@ async function initAdmin() {
       const res  = await fetch(`${CONFIG.appsScriptUrl}?action=config`);
       const data = await res.json();
       if (data.general && data.general.adminPassword) adminPassword = data.general.adminPassword;
+      if (data.general && data.general.negocio) CONFIG.negocio = data.general.negocio;
       if (data.colores) aplicarColores(data.colores);
+      document.getElementById('login-negocio').textContent = CONFIG.negocio;
     }
   } catch (e) { /* usa contraseña fallback */ }
 
@@ -167,10 +170,41 @@ function aplicarFiltros() {
 }
 
 function limpiarFiltros() {
+  tabActual = 'todas';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-todas').classList.add('active');
   setDefaultDates();
   document.getElementById('f-estado').value = '';
   document.getElementById('f-buscar').value = '';
   document.getElementById('f-orden').value  = 'desc';
+  aplicarFiltros();
+}
+
+// ── Tabs rápidos ──
+
+function cambiarTab(tab) {
+  tabActual = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  if (tab === 'pendientes') {
+    setDefaultDates();
+    document.getElementById('f-estado').value = 'Pendiente';
+    document.getElementById('f-buscar').value = '';
+    document.getElementById('f-orden').value  = 'asc';
+  } else if (tab === 'hoy') {
+    const hoy = toYMD(new Date());
+    document.getElementById('f-desde').value  = hoy;
+    document.getElementById('f-hasta').value  = hoy;
+    document.getElementById('f-estado').value = '';
+    document.getElementById('f-buscar').value = '';
+    document.getElementById('f-orden').value  = 'asc';
+  } else {
+    setDefaultDates();
+    document.getElementById('f-estado').value = '';
+    document.getElementById('f-buscar').value = '';
+    document.getElementById('f-orden').value  = 'desc';
+  }
   aplicarFiltros();
 }
 

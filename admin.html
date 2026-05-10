@@ -13,6 +13,7 @@
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">🗓️</div>
+    <div id="login-negocio" class="login-negocio"></div>
     <h2>Panel de Administración</h2>
     <p class="login-sub">Ingresá la contraseña para continuar</p>
     <div class="field">
@@ -95,6 +96,13 @@
           <button class="btn btn-outline" onclick="limpiarFiltros()">Limpiar</button>
         </div>
       </div>
+    </div>
+
+    <!-- Tabs rápidos -->
+    <div class="tabs-row">
+      <button class="tab-btn active" id="tab-todas"      onclick="cambiarTab('todas')">Todas</button>
+      <button class="tab-btn"        id="tab-pendientes" onclick="cambiarTab('pendientes')">⏳ Pendientes</button>
+      <button class="tab-btn"        id="tab-hoy"        onclick="cambiarTab('hoy')">📅 Hoy</button>
     </div>
 
     <!-- Tabla -->

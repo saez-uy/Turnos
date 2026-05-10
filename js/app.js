@@ -40,11 +40,19 @@ async function init() {
   document.getElementById('header-title').textContent  = CONFIG.negocio;
   document.getElementById('header-slogan').textContent = CONFIG.slogan;
   document.title = CONFIG.negocio;
+
   const elDireccion = document.getElementById('header-direccion');
   if (CONFIG.direccion) {
     elDireccion.textContent = '📍 ' + CONFIG.direccion;
     elDireccion.style.display = '';
   }
+  const elTelefono = document.getElementById('header-telefono');
+  if (CONFIG.telefono) {
+    elTelefono.textContent = '📞 ' + CONFIG.telefono;
+    elTelefono.href = 'tel:' + CONFIG.telefono.replace(/\D/g, '');
+    elTelefono.style.display = '';
+  }
+
   populateServicios();
   setDateLimits();
 
@@ -301,7 +309,6 @@ async function confirmar() {
     let errorMsg = '';
 
     if (CONFIG.appsScriptUrl && CONFIG.appsScriptUrl !== 'PEGAR_URL_AQUI') {
-      // Usamos GET con parámetros para evitar el problema del redirect de Apps Script con POST
       const params = new URLSearchParams({
         action:   'save',
         nombre:   payload.nombre,
@@ -325,7 +332,6 @@ async function confirmar() {
         errorMsg = data.error || 'Error al guardar la reserva.';
       }
     } else {
-      // Sin URL configurada: simular éxito (útil para desarrollo)
       clearTimeout(timeout);
       console.log('Reserva (modo demo):', payload);
       ok = true;
