@@ -1,5 +1,6 @@
 let todasLasReservas = [];
 let adminPassword = CONFIG.adminPassword || 'admin1234';
+let vistaActual = 'lista';
 
 // ── Init ──
 
@@ -66,7 +67,13 @@ async function mostrarDashboard() {
     }
   } catch (e) { /* usa colores por defecto */ }
 
+  setDefaultDates();
   cargarReservas();
+}
+
+function setDefaultDates() {
+  document.getElementById('f-desde').value = toYMD(new Date());
+  document.getElementById('f-hasta').value = toYMD(addDays(new Date(), 7));
 }
 
 function aplicarColores(colores) {
@@ -131,8 +138,9 @@ function aplicarFiltros() {
   const hasta  = document.getElementById('f-hasta').value;
   const estado = document.getElementById('f-estado').value;
   const buscar = document.getElementById('f-buscar').value.toLowerCase().trim();
+  const orden  = document.getElementById('f-orden').value;
 
-  const filtradas = todasLasReservas.filter(r => {
+  let filtradas = todasLasReservas.filter(r => {
     if (desde  && r.fecha < desde)  return false;
     if (hasta  && r.fecha > hasta)  return false;
     if (estado && r.estado !== estado) return false;
@@ -144,14 +152,34 @@ function aplicarFiltros() {
     return true;
   });
 
-  renderTabla(filtradas);
+  filtradas.sort((a, b) => {
+    const cmp = a.fecha !== b.fecha
+      ? a.fecha.localeCompare(b.fecha)
+      : a.hora.localeCompare(b.hora);
+    return orden === 'asc' ? cmp : -cmp;
+  });
+
+  if (vistaActual === 'semana') {
+    renderCalendario(filtradas);
+  } else {
+    renderTabla(filtradas);
+  }
 }
 
 function limpiarFiltros() {
-  document.getElementById('f-desde').value  = '';
-  document.getElementById('f-hasta').value  = '';
+  setDefaultDates();
   document.getElementById('f-estado').value = '';
   document.getElementById('f-buscar').value = '';
+  document.getElementById('f-orden').value  = 'desc';
+  aplicarFiltros();
+}
+
+// ── Vista ──
+
+function cambiarVista(vista) {
+  vistaActual = vista;
+  document.getElementById('btn-vista-lista').classList.toggle('active', vista === 'lista');
+  document.getElementById('btn-vista-semana').classList.toggle('active', vista === 'semana');
   aplicarFiltros();
 }
 
@@ -167,12 +195,7 @@ function renderTabla(lista) {
     return;
   }
 
-  const ordenadas = [...lista].sort((a, b) => {
-    if (a.fecha !== b.fecha) return b.fecha.localeCompare(a.fecha);
-    return b.hora.localeCompare(a.hora);
-  });
-
-  const rows = ordenadas.map(r => `
+  const rows = lista.map(r => `
     <tr>
       <td>${formatFecha(r.fecha)}</td>
       <td><strong>${r.hora}</strong></td>
@@ -211,6 +234,63 @@ function renderTabla(lista) {
       <tbody>${rows}</tbody>
     </table>
   `;
+}
+
+// ── Calendario semanal ──
+
+function renderCalendario(lista) {
+  const hoy   = toYMD(new Date());
+  const desde = document.getElementById('f-desde').value || hoy;
+  const hasta = document.getElementById('f-hasta').value || toYMD(addDays(new Date(), 7));
+
+  const dias = [];
+  let cur = new Date(desde + 'T00:00:00');
+  const fin = new Date(hasta + 'T00:00:00');
+  while (cur <= fin && dias.length <= 31) {
+    dias.push(toYMD(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const porDia = {};
+  dias.forEach(d => porDia[d] = []);
+  lista.forEach(r => { if (porDia[r.fecha] !== undefined) porDia[r.fecha].push(r); });
+  dias.forEach(d => porDia[d].sort((a, b) => a.hora.localeCompare(b.hora)));
+
+  const total = lista.length;
+  document.getElementById('tabla-count').textContent =
+    `${total} reserva${total !== 1 ? 's' : ''}`;
+
+  const cols = dias.map(d => {
+    const esHoy = d === hoy;
+    const cards = porDia[d].length === 0
+      ? '<p class="cal-empty">Sin turnos</p>'
+      : porDia[d].map(r => `
+          <div class="cal-card cal-${r.estado.toLowerCase()}">
+            <div class="cal-hora">${r.hora}</div>
+            <div class="cal-nombre">${esc(r.nombre)}</div>
+            <div class="cal-servicio">${esc(r.servicio)}</div>
+            <span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span>
+            ${r.estado !== 'Cancelado' ? `
+              <div class="cal-acciones">
+                <button class="btn btn-danger btn-sm" onclick="cancelar('${r.id}', this)">Cancelar</button>
+                ${r.estado !== 'Confirmada'
+                  ? `<button class="btn btn-success btn-sm" onclick="confirmarTurno('${r.id}', this)">Confirmar</button>`
+                  : ''}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+
+    return `
+      <div class="cal-col">
+        <div class="cal-dia-header${esHoy ? ' hoy' : ''}">${formatFechaCorta(d)}</div>
+        <div class="cal-dia-body">${cards}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('tabla-wrapper').innerHTML =
+    `<div class="cal-grid">${cols}</div>`;
 }
 
 // ── Cancelar / Confirmar ──
@@ -273,9 +353,7 @@ function abrirWhatsApp(reserva, estado) {
 function formatearTelefono(tel) {
   if (!tel) return '';
   let digits = tel.replace(/\D/g, '');
-  // Argentina: si empieza con 0, reemplazar por código de país 54
   if (digits.startsWith('0')) digits = '54' + digits.slice(1);
-  // Si no tiene código de país, agregar 54
   if (!digits.startsWith('54')) digits = '54' + digits;
   return digits;
 }
@@ -284,6 +362,12 @@ function formatearTelefono(tel) {
 
 function toYMD(d) {
   return d.toISOString().split('T')[0];
+}
+
+function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
 }
 
 function inicioSemana() {
@@ -297,6 +381,12 @@ function inicioSemana() {
 function formatFecha(ymd) {
   return new Date(ymd + 'T00:00:00').toLocaleDateString('es-AR', {
     weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric'
+  });
+}
+
+function formatFechaCorta(ymd) {
+  return new Date(ymd + 'T00:00:00').toLocaleDateString('es-AR', {
+    weekday: 'short', day: '2-digit', month: '2-digit'
   });
 }
 

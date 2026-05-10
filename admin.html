@@ -83,6 +83,13 @@
           <label for="f-buscar">Buscar</label>
           <input type="text" id="f-buscar" placeholder="Nombre, teléfono...">
         </div>
+        <div class="field">
+          <label for="f-orden">Ordenar</label>
+          <select id="f-orden">
+            <option value="desc">Más reciente primero</option>
+            <option value="asc">Más antigua primero</option>
+          </select>
+        </div>
         <div class="field field-btn">
           <button class="btn btn-primary" onclick="aplicarFiltros()">Filtrar</button>
           <button class="btn btn-outline" onclick="limpiarFiltros()">Limpiar</button>
@@ -94,7 +101,13 @@
     <div class="tabla-card">
       <div class="tabla-header">
         <span id="tabla-count" class="tabla-count"></span>
-        <button class="btn btn-outline btn-sm" onclick="cargarReservas()">↻ Actualizar</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="vista-toggle">
+            <button id="btn-vista-lista" class="btn-vista active" onclick="cambiarVista('lista')">≡ Lista</button>
+            <button id="btn-vista-semana" class="btn-vista" onclick="cambiarVista('semana')">⊞ Semana</button>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="cargarReservas()">↻ Actualizar</button>
+        </div>
       </div>
       <div id="tabla-wrapper">
         <p class="slots-empty" style="padding:20px 0">Cargando reservas...</p>
