@@ -217,15 +217,17 @@ function renderTabla(lista) {
 
 async function cancelar(id, btn) {
   if (!confirm('¿Cancelar este turno?')) return;
-  await cambiarEstado(id, 'cancelar', 'Cancelado', btn, 'Cancelar');
+  const reserva = todasLasReservas.find(x => x.id === id);
+  await cambiarEstado(id, 'cancelar', 'Cancelado', btn, 'Cancelar', reserva);
 }
 
 async function confirmarTurno(id, btn) {
   if (!confirm('¿Confirmar este turno?')) return;
-  await cambiarEstado(id, 'confirmar', 'Confirmada', btn, 'Confirmar');
+  const reserva = todasLasReservas.find(x => x.id === id);
+  await cambiarEstado(id, 'confirmar', 'Confirmada', btn, 'Confirmar', reserva);
 }
 
-async function cambiarEstado(id, action, nuevoEstado, btn, labelOriginal) {
+async function cambiarEstado(id, action, nuevoEstado, btn, labelOriginal, reserva) {
   btn.disabled = true;
   btn.textContent = '...';
 
@@ -235,15 +237,47 @@ async function cambiarEstado(id, action, nuevoEstado, btn, labelOriginal) {
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Error desconocido');
 
-    const r = todasLasReservas.find(x => x.id === id);
-    if (r) r.estado = nuevoEstado;
+    if (reserva) reserva.estado = nuevoEstado;
     actualizarStats();
     aplicarFiltros();
+
+    if (reserva) abrirWhatsApp(reserva, nuevoEstado);
   } catch (e) {
     alert(`No se pudo actualizar: ${e.message}`);
     btn.disabled = false;
     btn.textContent = labelOriginal;
   }
+}
+
+function abrirWhatsApp(reserva, estado) {
+  const tel = formatearTelefono(reserva.telefono);
+  if (!tel) return;
+
+  const fecha = formatFecha(reserva.fecha);
+  let mensaje;
+
+  if (estado === 'Confirmada') {
+    mensaje =
+      `Hola ${reserva.nombre}! Te confirmamos tu turno de *${reserva.servicio}* ` +
+      `para el *${fecha}* a las *${reserva.hora}*. ¡Te esperamos!`;
+  } else {
+    mensaje =
+      `Hola ${reserva.nombre}, lamentamos informarte que tu turno de *${reserva.servicio}* ` +
+      `para el *${fecha}* a las *${reserva.hora}* fue cancelado. ` +
+      `Comunicate con nosotros para reprogramarlo.`;
+  }
+
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+function formatearTelefono(tel) {
+  if (!tel) return '';
+  let digits = tel.replace(/\D/g, '');
+  // Argentina: si empieza con 0, reemplazar por código de país 54
+  if (digits.startsWith('0')) digits = '54' + digits.slice(1);
+  // Si no tiene código de país, agregar 54
+  if (!digits.startsWith('54')) digits = '54' + digits;
+  return digits;
 }
 
 // ── Helpers ──
