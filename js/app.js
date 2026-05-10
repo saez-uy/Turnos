@@ -290,15 +290,17 @@ async function confirmar() {
   document.getElementById('alerta-confirmar').innerHTML = '';
 
   const sv = getServicio();
+  const emailVal = document.getElementById('email').value.trim();
   const payload = {
     nombre,
     telefono,
-    email:    document.getElementById('email').value.trim(),
-    servicio: sv ? sv.nombre : '',
-    duracion: sv ? sv.duracion : CONFIG.intervalo,
-    fecha:    document.getElementById('fecha').value,
-    hora:     selectedSlot,
-    notas:    document.getElementById('notas').value.trim(),
+    email:     emailVal,
+    servicio:  sv ? sv.nombre : '',
+    duracion:  sv ? sv.duracion : CONFIG.intervalo,
+    fecha:     document.getElementById('fecha').value,
+    hora:      selectedSlot,
+    notas:     document.getElementById('notas').value.trim(),
+    notificar: (emailVal && document.getElementById('notificar').checked) ? 'true' : '',
   };
 
   const controller = new AbortController();
@@ -310,15 +312,16 @@ async function confirmar() {
 
     if (CONFIG.appsScriptUrl && CONFIG.appsScriptUrl !== 'PEGAR_URL_AQUI') {
       const params = new URLSearchParams({
-        action:   'save',
-        nombre:   payload.nombre,
-        telefono: payload.telefono,
-        email:    payload.email,
-        servicio: payload.servicio,
-        duracion: payload.duracion,
-        fecha:    payload.fecha,
-        hora:     payload.hora,
-        notas:    payload.notas,
+        action:    'save',
+        nombre:    payload.nombre,
+        telefono:  payload.telefono,
+        email:     payload.email,
+        servicio:  payload.servicio,
+        duracion:  payload.duracion,
+        fecha:     payload.fecha,
+        hora:      payload.hora,
+        notas:     payload.notas,
+        notificar: payload.notificar,
       });
       const res  = await fetch(`${CONFIG.appsScriptUrl}?${params}`, {
         signal:   controller.signal,
@@ -359,12 +362,25 @@ async function confirmar() {
   }
 }
 
+function toggleNotificar() {
+  const email = document.getElementById('email').value.trim();
+  const campo = document.getElementById('campo-notificar');
+  if (email) {
+    campo.style.display = '';
+  } else {
+    campo.style.display = 'none';
+    document.getElementById('notificar').checked = false;
+  }
+}
+
 function nuevaReserva() {
   document.getElementById('servicio').selectedIndex  = 0;
   document.getElementById('fecha').value     = '';
   document.getElementById('nombre').value    = '';
   document.getElementById('telefono').value  = '';
   document.getElementById('email').value     = '';
+  document.getElementById('notificar').checked = false;
+  document.getElementById('campo-notificar').style.display = 'none';
   document.getElementById('notas').value     = '';
   document.getElementById('slots-container').innerHTML =
     '<p class="slots-empty">Seleccioná una fecha para ver los turnos disponibles.</p>';

@@ -164,6 +164,32 @@ textarea { resize: vertical; min-height: 72px; }
 .slot-btn:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; text-decoration: line-through; }
 .slots-empty { color: var(--muted); font-size: 0.9rem; padding: 10px 0; }
 
+/* Checkbox notificar */
+.field-check { margin-bottom: 18px; }
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 0;
+}
+.check-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  padding: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+
 /* Resumen */
 .resumen {
   background: #f8fafc;

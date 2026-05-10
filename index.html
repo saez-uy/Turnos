@@ -88,7 +88,13 @@
       </div>
       <div class="field">
         <label for="email">Email (opcional)</label>
-        <input type="email" id="email" placeholder="Ej: maria@email.com">
+        <input type="email" id="email" placeholder="Ej: maria@email.com" oninput="toggleNotificar()">
+      </div>
+      <div class="field-check" id="campo-notificar" style="display:none">
+        <label class="check-label">
+          <input type="checkbox" id="notificar">
+          <span>Notificarme el día antes por email</span>
+        </label>
       </div>
       <div class="field">
         <label for="notas">Notas (opcional)</label>

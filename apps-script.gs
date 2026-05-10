@@ -8,7 +8,7 @@ const CONFIG_NOMBRE = "Configuracion";
 const HEADERS = [
   "ID", "Nombre", "Telefono", "Email",
   "Servicio", "Duracion", "Fecha", "Hora",
-  "Estado", "Notas", "Creado"
+  "Estado", "Notas", "Notificar", "Creado"
 ];
 
 const CONFIG_DEFAULTS = [
@@ -113,13 +113,14 @@ function guardarReserva(p) {
     id,
     p.nombre,
     p.telefono,
-    p.email    || "",
+    p.email      || "",
     p.servicio,
     duracion,
     "'" + p.fecha,   // fuerza texto: evita auto-conversión a Date
     "'" + p.hora,    // fuerza texto: evita auto-conversión a Time
     "Pendiente",
-    p.notas    || "",
+    p.notas      || "",
+    p.notificar  || "",
     new Date().toLocaleString("es-AR")
   ]);
 
@@ -134,17 +135,18 @@ function getTodasLasReservas() {
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
     reservas.push({
-      id:       limpiarCelda(row[0]),
-      nombre:   limpiarCelda(row[1]),
-      telefono: limpiarCelda(row[2]),
-      email:    limpiarCelda(row[3]),
-      servicio: limpiarCelda(row[4]),
-      duracion: limpiarCelda(row[5]),
-      fecha:    limpiarCelda(row[6]),
-      hora:     limpiarCelda(row[7]),
-      estado:   limpiarCelda(row[8]),
-      notas:    limpiarCelda(row[9]),
-      creado:   limpiarCelda(row[10]),
+      id:        limpiarCelda(row[0]),
+      nombre:    limpiarCelda(row[1]),
+      telefono:  limpiarCelda(row[2]),
+      email:     limpiarCelda(row[3]),
+      servicio:  limpiarCelda(row[4]),
+      duracion:  limpiarCelda(row[5]),
+      fecha:     limpiarCelda(row[6]),
+      hora:      limpiarCelda(row[7]),
+      estado:    limpiarCelda(row[8]),
+      notas:     limpiarCelda(row[9]),
+      notificar: limpiarCelda(row[10]),
+      creado:    limpiarCelda(row[11]),
     });
   }
   return reservas;
@@ -297,6 +299,93 @@ function horaAMin(hora) {
   return h * 60 + m;
 }
 
+// ---- Recordatorios por email ----
+
+// Ejecutar createDailyTrigger() UNA vez desde el editor para activar el envío automático
+function sendReminders() {
+  const sheet = getSheet();
+  const data  = sheet.getDataRange().getValues();
+
+  const tz       = Session.getScriptTimeZone();
+  const manana   = new Date();
+  manana.setDate(manana.getDate() + 1);
+  const mananaStr = Utilities.formatDate(manana, tz, "yyyy-MM-dd");
+
+  const config  = getConfig();
+  const negocio = (config.general && config.general.negocio) ? config.general.negocio : "Tu negocio";
+
+  for (let i = 1; i < data.length; i++) {
+    const row      = data[i];
+    const fecha    = limpiarCelda(row[6]);
+    const estado   = limpiarCelda(row[8]);
+    const notificar = limpiarCelda(row[10]);
+    const email    = limpiarCelda(row[3]);
+
+    if (fecha !== mananaStr) continue;
+    if (estado !== "Confirmada") continue;
+    if (notificar !== "true") continue;
+    if (!email) continue;
+
+    const nombre   = limpiarCelda(row[1]);
+    const hora     = limpiarCelda(row[7]);
+    const servicio = limpiarCelda(row[4]);
+    const fechaES  = formatearFechaES(fecha);
+
+    const asunto = `Recordatorio de turno — ${negocio}`;
+
+    const cuerpoTexto =
+      `Hola ${nombre},\n\n` +
+      `Te recordamos que mañana tenés un turno:\n\n` +
+      `📅 Fecha: ${fechaES}\n` +
+      `🕐 Hora: ${hora}\n` +
+      `💼 Servicio: ${servicio}\n\n` +
+      `Si necesitás cancelar o reprogramar, comunicate con nosotros.\n\n` +
+      `— ${negocio}`;
+
+    const cuerpoHtml =
+      `<p>Hola <strong>${nombre}</strong>,</p>` +
+      `<p>Te recordamos que mañana tenés un turno:</p>` +
+      `<table style="border-collapse:collapse;margin:12px 0">` +
+        `<tr><td style="padding:4px 12px 4px 0;color:#64748b">📅 Fecha</td><td style="padding:4px 0"><strong>${fechaES}</strong></td></tr>` +
+        `<tr><td style="padding:4px 12px 4px 0;color:#64748b">🕐 Hora</td><td style="padding:4px 0"><strong>${hora}</strong></td></tr>` +
+        `<tr><td style="padding:4px 12px 4px 0;color:#64748b">💼 Servicio</td><td style="padding:4px 0"><strong>${servicio}</strong></td></tr>` +
+      `</table>` +
+      `<p style="color:#64748b;font-size:0.9em">Si necesitás cancelar o reprogramar, comunicate con nosotros.</p>` +
+      `<p>— ${negocio}</p>`;
+
+    try {
+      GmailApp.sendEmail(email, asunto, cuerpoTexto, {
+        htmlBody: cuerpoHtml,
+        name: negocio,
+      });
+    } catch (e) {
+      console.log("Error enviando recordatorio a " + email + ": " + e.message);
+    }
+  }
+}
+
+function formatearFechaES(ymd) {
+  const [y, m, d] = ymd.split("-");
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio",
+                 "agosto","septiembre","octubre","noviembre","diciembre"];
+  return `${parseInt(d)} de ${meses[parseInt(m) - 1]} de ${y}`;
+}
+
+// Ejecutar esta función UNA VEZ desde el editor de Apps Script para programar el envío diario
+function createDailyTrigger() {
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === "sendReminders")
+    .forEach(t => ScriptApp.deleteTrigger(t));
+
+  ScriptApp.newTrigger("sendReminders")
+    .timeBased()
+    .everyDays(1)
+    .atHour(8)
+    .create();
+
+  console.log("Trigger creado: sendReminders se ejecutará diariamente a las 8 AM.");
+}
+
 function respuesta(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
@@ -319,4 +408,26 @@ function respuesta(obj) {
 //
 //  IMPORTANTE: cada vez que modifiques el script debés crear
 //  una NUEVA implementación para que los cambios tomen efecto.
+//
+// ============================================================
+//  CONFIGURAR RECORDATORIOS POR EMAIL
+// ============================================================
+//
+//  REQUISITO: el script debe ejecutarse con la cuenta de Google
+//  que es dueña de la casilla turnosuy2026@gmail.com.
+//  Si el sheet/script está en otra cuenta, el email se enviará
+//  desde esa cuenta (no desde turnosuy2026@gmail.com).
+//
+//  Para activar los recordatorios automáticos:
+//  1. En el editor de Apps Script, seleccioná la función
+//     "createDailyTrigger" en el menú desplegable
+//  2. Hacé clic en "Ejecutar"
+//  3. Aceptá los permisos que pide (Gmail, Sheets)
+//  4. Listo: sendReminders() correrá todos los días a las 8 AM
+//     y enviará recordatorios a quienes eligieron la opción
+//     "Notificarme el día antes" y su turno está Confirmado.
+//
+//  Para verificar que el trigger existe:
+//  Activadores (reloj) → deberías ver sendReminders con
+//  frecuencia "Basado en tiempo - Día - 8 a.m."
 // ============================================================
