@@ -362,17 +362,6 @@ async function confirmar() {
   }
 }
 
-function toggleNotificar() {
-  const email = document.getElementById('email').value.trim();
-  const campo = document.getElementById('campo-notificar');
-  if (email) {
-    campo.style.display = '';
-  } else {
-    campo.style.display = 'none';
-    document.getElementById('notificar').checked = false;
-  }
-}
-
 function nuevaReserva() {
   document.getElementById('servicio').selectedIndex  = 0;
   document.getElementById('fecha').value     = '';
@@ -380,7 +369,6 @@ function nuevaReserva() {
   document.getElementById('telefono').value  = '';
   document.getElementById('email').value     = '';
   document.getElementById('notificar').checked = false;
-  document.getElementById('campo-notificar').style.display = 'none';
   document.getElementById('notas').value     = '';
   document.getElementById('slots-container').innerHTML =
     '<p class="slots-empty">Seleccioná una fecha para ver los turnos disponibles.</p>';
