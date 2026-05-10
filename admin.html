@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Reservas</title>
+  <script>if(localStorage.getItem('turnosDarkMode')==='1')document.documentElement.classList.add('dark');</script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
+
+<button class="btn-darkmode" id="btn-darkmode" onclick="toggleDarkMode()" title="Modo oscuro">🌙</button>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -44,18 +47,22 @@
     <!-- Stats -->
     <div class="stats-row">
       <div class="stat-card">
+        <div class="stat-icon">📅</div>
         <div class="stat-num" id="stat-hoy">—</div>
         <div class="stat-label">Hoy</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">📊</div>
         <div class="stat-num" id="stat-semana">—</div>
         <div class="stat-label">Esta semana</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">⏳</div>
         <div class="stat-num" id="stat-pendientes">—</div>
         <div class="stat-label">Pendientes</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">📋</div>
         <div class="stat-num" id="stat-total">—</div>
         <div class="stat-label">Total</div>
       </div>
@@ -129,6 +136,7 @@
 
 <script src="js/config.js"></script>
 <script src="js/empresa.js"></script>
+<script src="js/darkmode.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
