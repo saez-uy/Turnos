@@ -160,6 +160,11 @@ function irPaso2() {
   if (!sv)    { alert('Seleccioná un servicio.'); return; }
   if (!fecha) { alert('Seleccioná una fecha.');   return; }
 
+  if (fecha <= toYMD(new Date())) {
+    alert('El turno debe ser para una fecha posterior a hoy.');
+    return;
+  }
+
   const dow = new Date(fecha + 'T00:00:00').getDay();
   if (!CONFIG.horarios[dow]) {
     alert('No hay atención ese día. Por favor elegí otra fecha.');
