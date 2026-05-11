@@ -60,13 +60,96 @@ body {
   background: linear-gradient(135deg, #4f6ef7 0%, #6366f1 100%);
   color: #fff;
   text-align: center;
-  padding: 48px 20px 40px;
+  padding: 52px 20px 84px;
+  position: relative;
+  overflow: hidden;
 }
-.header h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.5px; }
-.header p  { margin-top: 6px; opacity: 0.88; font-size: 0.98rem; font-weight: 500; }
-.header-sub { display: block; font-size: 0.85rem; opacity: 0.78; margin-top: 5px; }
+.header h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.5px; position: relative; z-index: 1; }
+.header p  { margin-top: 6px; opacity: 0.88; font-size: 0.98rem; font-weight: 500; position: relative; z-index: 1; }
+.header-sub { display: block; font-size: 0.85rem; opacity: 0.78; margin-top: 5px; position: relative; z-index: 1; }
 .header-tel { color: #fff; text-decoration: none; transition: opacity 0.15s; }
 .header-tel:hover { opacity: 1; text-decoration: underline; }
+
+/* Círculos decorativos de fondo */
+.header-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  pointer-events: none;
+}
+.header-circle-1 { width: 320px; height: 320px; top: -120px; right: -80px; }
+.header-circle-2 { width: 200px; height: 200px; bottom: 10px;  left: -60px; }
+.header-circle-3 { width: 120px; height: 120px; top: 20px;    left: 10%;   background: rgba(255,255,255,0.04); }
+
+/* Muela SVG flotante */
+.header-deco {
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.tooth-svg {
+  width: 64px;
+  height: auto;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.22));
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-9px); }
+}
+
+/* Badges de beneficios */
+.header-badges {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  position: relative;
+  z-index: 1;
+}
+.header-badge {
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Wave de transición header → features */
+.header-wave {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 56px;
+  pointer-events: none;
+  z-index: 2;
+}
+.header-wave svg { width: 100%; height: 100%; display: block; }
+.wave-path { fill: var(--card); }
+
+/* ── Features strip ── */
+.features-strip {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  transition: background 0.25s, border-color 0.25s;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 26px;
+  border-right: 1px solid var(--border);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.feature-item:last-child { border-right: none; }
+.feature-icon { font-size: 1.1rem; line-height: 1; }
 
 /* ── Progress ── */
 .progress {
@@ -344,6 +427,36 @@ textarea { resize: vertical; min-height: 72px; }
 .exito h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
 .exito p  { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
 
+/* ── Tips card (paso 4) ── */
+.tips-card {
+  background: linear-gradient(135deg, rgba(79,110,247,0.06) 0%, rgba(99,102,241,0.07) 100%);
+  border: 1px solid rgba(79,110,247,0.18);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+:root.dark .tips-card {
+  background: rgba(79,110,247,0.08);
+  border-color: rgba(79,110,247,0.22);
+}
+.tips-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.tip-item {
+  font-size: 0.87rem;
+  color: var(--text);
+  padding: 5px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 /* ── Loading ── */
 #loading-screen {
   position: fixed;
@@ -374,8 +487,17 @@ textarea { resize: vertical; min-height: 72px; }
   opacity: 0.5;
 }
 
+@media (max-width: 540px) {
+  .feature-item { padding: 12px 16px; font-size: 0.78rem; }
+}
+@media (max-width: 400px) {
+  .feature-text { display: none; }
+  .feature-icon { font-size: 1.3rem; }
+  .feature-item { padding: 12px 20px; }
+}
 @media (max-width: 480px) {
   .card { padding: 20px; }
   .header h1 { font-size: 1.5rem; }
   .dot-line { width: 20px; }
+  .header-badge { font-size: 0.72rem; padding: 4px 10px; }
 }
