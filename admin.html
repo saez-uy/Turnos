@@ -10,8 +10,6 @@
 </head>
 <body>
 
-<button class="btn-darkmode" id="btn-darkmode" onclick="toggleDarkMode()" title="Modo oscuro">🌙</button>
-
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
@@ -39,7 +37,10 @@
         <div class="admin-subtitle">Panel de Reservas</div>
       </div>
     </div>
-    <button class="btn btn-outline btn-sm" onclick="logout()">Cerrar sesión</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn-darkmode-header" id="btn-darkmode" onclick="toggleDarkMode()" title="Modo oscuro">🌙</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Cerrar sesión</button>
+    </div>
   </div>
 
   <div class="admin-body">

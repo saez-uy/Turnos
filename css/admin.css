@@ -44,6 +44,20 @@
   padding: 7px 14px;
 }
 .admin-header .btn-outline:hover { background: rgba(255,255,255,0.15); }
+.btn-darkmode-header {
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  width: 34px; height: 34px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s;
+}
+.btn-darkmode-header:hover { background: rgba(255,255,255,0.28); }
 
 /* ── Body ── */
 .admin-body {

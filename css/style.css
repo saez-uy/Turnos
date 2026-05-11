@@ -247,7 +247,16 @@ textarea { resize: vertical; min-height: 72px; }
   cursor: not-allowed;
   text-decoration: line-through;
 }
-.slots-empty { color: var(--muted); font-size: 0.9rem; padding: 10px 0; }
+.slots-empty { color: var(--muted); font-size: 0.9rem; padding: 10px 0; display: flex; align-items: center; gap: 8px; }
+.slots-loader {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
 
 /* ── Checkbox notificar ── */
 .field-check { margin-bottom: 18px; }

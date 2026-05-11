@@ -175,7 +175,7 @@ async function loadSlots() {
   const sv    = getServicio();
   const fecha = document.getElementById('fecha').value;
   const container = document.getElementById('slots-container');
-  container.innerHTML = '<p class="slots-empty">Consultando disponibilidad...</p>';
+  container.innerHTML = '<p class="slots-empty"><span class="slots-loader"></span>Consultando disponibilidad...</p>';
   selectedSlot = null;
   document.getElementById('btn-paso2').disabled = true;
 
