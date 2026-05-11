@@ -55,6 +55,7 @@ async function init() {
 
   populateServicios();
   setDateLimits();
+  checkPaso1();
 
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('app').style.display = '';
@@ -95,6 +96,14 @@ function setDateLimits() {
   const input = document.getElementById('fecha');
   input.min = toYMD(tomorrow);
   input.max = toYMD(maxDay);
+}
+
+function checkPaso1() {
+  const sv    = document.getElementById('servicio').value;
+  const fecha = document.getElementById('fecha').value;
+  const hoy   = toYMD(new Date());
+  const ok    = sv && fecha && fecha > hoy;
+  document.getElementById('btn-paso1').disabled = !ok;
 }
 
 // ---- Helpers ----
@@ -379,6 +388,7 @@ function nuevaReserva() {
   document.getElementById('alerta-confirmar').innerHTML = '';
   document.getElementById('btn-confirmar').disabled    = false;
   document.getElementById('btn-confirmar').textContent = 'Confirmar turno';
+  document.getElementById('btn-paso1').disabled = true;
   selectedSlot = null;
   goToStep(1);
 }

@@ -86,17 +86,17 @@
 
       <div class="field">
         <label for="servicio">Servicio</label>
-        <select id="servicio">
+        <select id="servicio" onchange="checkPaso1()">
           <option value="">— Elegí un servicio —</option>
         </select>
       </div>
 
       <div class="field">
         <label for="fecha">Fecha</label>
-        <input type="date" id="fecha">
+        <input type="date" id="fecha" onchange="checkPaso1()">
       </div>
 
-      <button class="btn btn-primary btn-full" onclick="irPaso2()">Ver turnos disponibles →</button>
+      <button class="btn btn-primary btn-full" id="btn-paso1" onclick="irPaso2()" disabled>Ver turnos disponibles →</button>
     </div>
   </div>
 
